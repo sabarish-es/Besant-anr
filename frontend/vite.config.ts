@@ -28,7 +28,7 @@ export default defineConfig(({ mode }) => {
     plugins: [react()],
     resolve: { alias: { '@': fileURLToPath(new URL('./src/', import.meta.url)) } },
     server: {
-      host: '127.0.0.1', port: Number(env.FRONTEND_PORT || '5173'), strictPort: false,
+      host: '0.0.0.0', port: Number(env.FRONTEND_PORT || '5174'), strictPort: true,
       proxy: { '/api': proxy },
     },
     preview: {
