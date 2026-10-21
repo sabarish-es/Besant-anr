@@ -1,5 +1,5 @@
 import { spawn } from 'node:child_process';
-import { existsSync } from 'node:fs';
+import { cpSync, existsSync, rmSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 const root = fileURLToPath(new URL('../', import.meta.url));
 const frontend = fileURLToPath(new URL('../frontend/', import.meta.url));
@@ -35,7 +35,12 @@ for (const key of ['SUPABASE_URL', 'SUPABASE_PUBLISHABLE_KEY', 'SUPABASE_SECRET_
   if (process.env[key]) apiArgs.push('--var', `${key}:${process.env[key]}`);
 }
 async function check() { await run(tsc, ['--noEmit']); if (!stopping) await run(tsc, ['--noEmit', '-p', 'tsconfig.json'], frontend); }
-async function build() { await check(); if (!stopping) await run(vite, ['build'], frontend); if (!stopping) await run(wrangler, ['deploy', '--dry-run', '--config', 'wrangler.local.jsonc', '--outdir', '.sites-runtime/worker-build']); }
+async function buildFrontend() {
+  await run(vite, ['build'], frontend);
+  rmSync(new URL('../dist/', import.meta.url), { recursive: true, force: true });
+  cpSync(new URL('../frontend/dist/', import.meta.url), new URL('../dist/', import.meta.url), { recursive: true });
+}
+async function build() { await check(); if (!stopping) await buildFrontend(); if (!stopping) await run(wrangler, ['deploy', '--dry-run', '--config', 'wrangler.local.jsonc', '--outdir', '.sites-runtime/worker-build']); }
 try {
   if (command === 'typecheck') await check();
   else if (command === 'build') await build();
