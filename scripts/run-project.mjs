@@ -1,4 +1,5 @@
 import { spawn } from 'node:child_process';
+import { createConnection } from 'node:net';
 import { cpSync, existsSync, rmSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 const root = fileURLToPath(new URL('../', import.meta.url));
@@ -23,7 +24,15 @@ function stop(code = 0) {
   for (const child of children) child.kill('SIGINT');
   const timeout = setTimeout(() => { for (const child of children) child.kill('SIGKILL'); }, 5000); timeout.unref();
 }
-process.on('SIGINT', () => stop()); process.on('SIGTERM', () => stop());
+function portIsOpen(port, host = '127.0.0.1') {
+  return new Promise(resolve => {
+    const socket = createConnection({ port, host });
+    const finish = open => { socket.destroy(); resolve(open); };
+    socket.once('connect', () => finish(true));
+    socket.once('error', () => finish(false));
+    socket.setTimeout(250, () => finish(false));
+  });
+}
 async function run(script, args, cwd = root) {
   const child = start(script, args, cwd);
   const status = await new Promise((resolve, reject) => { child.once('error', reject); child.once('exit', (code, signal) => resolve(code ?? (signal ? 1 : 0))); });
@@ -50,9 +59,12 @@ try {
   else if (['dev', 'dev:api', 'preview'].includes(command)) {
     if (!existsSync(new URL('../frontend/dist/index.html', import.meta.url))) await run(vite, ['build'], frontend);
     if (!stopping) {
-      const tasks = [start(wrangler, apiArgs)];
+      const apiPort = Number(process.env.API_PORT || '8787');
+      const tasks = [];
+      if (!(await portIsOpen(apiPort))) tasks.push(start(wrangler, apiArgs));
+      else console.log(`API already running on http://127.0.0.1:${apiPort}; reusing it.`);
       if (command === 'dev') tasks.push(start(vite, [], frontend));
-      console.log(command === 'dev' ? 'Starting React and API. Open http://127.0.0.1:5173. Press Ctrl+C to stop both.' : 'Serving the built React app and API on http://127.0.0.1:' + (process.env.API_PORT || '8787'));
+      console.log(command === 'dev' ? 'Starting React and API. Open the Vite preview URL shown below.' : 'Serving the built React app and API on http://127.0.0.1:' + apiPort);
       for (const child of tasks) { child.once('error', error => { console.error(error.message); stop(1); }); child.once('exit', code => { if (!stopping) stop(code || 1); }); }
     }
   } else throw new Error('Unknown project command.');
