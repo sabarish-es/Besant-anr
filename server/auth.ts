@@ -9,7 +9,7 @@ export function authConfigured(env: Env) {
     const url = new URL(env.SUPABASE_URL);
     return url.protocol === 'https:' && /^[a-z0-9-]+\.supabase\.co$/.test(url.hostname) &&
       !url.username && !url.password && !!env.SUPABASE_PUBLISHABLE_KEY &&
-      env.SUPABASE_PUBLISHABLE_KEY.startsWith('sb_publishable_') && !env.SUPABASE_PUBLISHABLE_KEY.includes('REPLACE') && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(env.ADMIN_EMAIL || '');
+      env.SUPABASE_PUBLISHABLE_KEY.startsWith('sb_publishable_') && !env.SUPABASE_PUBLISHABLE_KEY.includes('REPLACE');
   } catch { return false; }
 }
 

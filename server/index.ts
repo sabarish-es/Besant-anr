@@ -91,7 +91,7 @@ export function createWorker(send: typeof fetch = fetch) {
           throw new HubError('Sign-in is not configured. Contact your administrator.', 503);
         }
         if (!env.DB) throw new HubError('The institute database is unavailable.', 503);
-        const hub = createHub(env.DB, { bootstrapAdminEmail: env.ADMIN_EMAIL });
+        const hub = createHub(env.DB, { bootstrapAdminEmail: env.ADMIN_EMAIL || 'besanannanagar@gmail.com' });
         if (url.pathname === '/api/auth/login' && request.method === 'POST') {
           const input = await body(request);
           const identifier = String(input.identifier || input.email || '').trim().toLowerCase();

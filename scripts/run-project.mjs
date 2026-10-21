@@ -8,7 +8,9 @@ const tsc = fileURLToPath(new URL('../node_modules/typescript/bin/tsc', import.m
 const wrangler = fileURLToPath(new URL('../node_modules/wrangler/bin/wrangler.js', import.meta.url));
 const [command] = process.argv.slice(2);
 const envFile = new URL('../.env', import.meta.url);
+const projectEnvFile = '/vercel/share/.env.project';
 if (existsSync(envFile)) process.loadEnvFile(fileURLToPath(envFile));
+if (existsSync(projectEnvFile)) process.loadEnvFile(projectEnvFile);
 process.env.WRANGLER_SEND_METRICS ??= 'false';
 if (!existsSync(vite) || !existsSync(wrangler)) { console.error('Install dependencies first: npx pnpm@11.25.0 install --frozen-lockfile'); process.exit(1); }
 const children = new Set(); let stopping = false;
@@ -29,6 +31,9 @@ async function run(script, args, cwd = root) {
   if (status !== 0) throw new Error('Command failed with exit code ' + status);
 }
 const apiArgs = ['dev', '--config', 'wrangler.local.jsonc', '--local', '--ip', '127.0.0.1', '--port', process.env.API_PORT || '8787', '--inspector-port', '0', '--persist-to', '.wrangler/state-production'];
+for (const key of ['SUPABASE_URL', 'SUPABASE_PUBLISHABLE_KEY', 'SUPABASE_SECRET_KEY', 'ADMIN_EMAIL']) {
+  if (process.env[key]) apiArgs.push('--var', `${key}:${process.env[key]}`);
+}
 async function check() { await run(tsc, ['--noEmit']); if (!stopping) await run(tsc, ['--noEmit', '-p', 'tsconfig.json'], frontend); }
 async function build() { await check(); if (!stopping) await run(vite, ['build'], frontend); if (!stopping) await run(wrangler, ['deploy', '--dry-run', '--config', 'wrangler.local.jsonc', '--outdir', '.sites-runtime/worker-build']); }
 try {
