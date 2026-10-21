@@ -28,7 +28,7 @@ async function run(script, args, cwd = root) {
   if (stopping) return;
   if (status !== 0) throw new Error('Command failed with exit code ' + status);
 }
-const apiArgs = ['dev', '--config', 'wrangler.local.jsonc', '--local', '--ip', '127.0.0.1', '--port', process.env.API_PORT || '5174', '--inspector-port', '0', '--persist-to', '.wrangler/state-production'];
+const apiArgs = ['dev', '--config', 'wrangler.local.jsonc', '--local', '--ip', '127.0.0.1', '--port', process.env.API_PORT || '8787', '--inspector-port', '0', '--persist-to', '.wrangler/state-production'];
 async function check() { await run(tsc, ['--noEmit']); if (!stopping) await run(tsc, ['--noEmit', '-p', 'tsconfig.json'], frontend); }
 async function build() { await check(); if (!stopping) await run(vite, ['build'], frontend); if (!stopping) await run(wrangler, ['deploy', '--dry-run', '--config', 'wrangler.local.jsonc', '--outdir', '.sites-runtime/worker-build']); }
 try {
@@ -42,7 +42,7 @@ try {
     if (!stopping) {
       const tasks = [start(wrangler, apiArgs)];
       if (command === 'dev') tasks.push(start(vite, [], frontend));
-      console.log(command === 'dev' ? 'Starting React and API. Open http://127.0.0.1:5173. Press Ctrl+C to stop both.' : 'Serving the built React app and API on http://127.0.0.1:' + (process.env.API_PORT || '5174'));
+      console.log(command === 'dev' ? 'Starting React and API. Open http://127.0.0.1:5173. Press Ctrl+C to stop both.' : 'Serving the built React app and API on http://127.0.0.1:' + (process.env.API_PORT || '8787'));
       for (const child of tasks) { child.once('error', error => { console.error(error.message); stop(1); }); child.once('exit', code => { if (!stopping) stop(code || 1); }); }
     }
   } else throw new Error('Unknown project command.');
