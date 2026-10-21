@@ -1,0 +1,6 @@
+# Copy to .dev.vars for local development. Never commit .dev.vars.
+# Use a separate Supabase project for local development when possible.
+SUPABASE_URL=https://REPLACE_WITH_PROJECT_REF.supabase.co
+SUPABASE_PUBLISHABLE_KEY=REPLACE_WITH_SUPABASE_PUBLISHABLE_KEY
+SUPABASE_SECRET_KEY=REPLACE_WITH_SUPABASE_SECRET_KEY
+ADMIN_EMAIL=REPLACE_WITH_YOUR_REAL_ADMIN_EMAIL

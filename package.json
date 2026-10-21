@@ -1,0 +1,46 @@
+{
+  "name": "besant-studenthub",
+  "version": "1.0.0",
+  "private": true,
+  "engines": {
+    "node": ">=24.0.0"
+  },
+  "scripts": {
+    "dev": "node scripts/run-project.mjs dev",
+    "dev:api": "node scripts/run-project.mjs dev:api",
+    "dev:frontend": "node scripts/run-project.mjs dev:frontend",
+    "start": "node scripts/run-project.mjs preview",
+    "build": "node scripts/run-project.mjs build",
+    "build:api": "node scripts/run-project.mjs build:api",
+    "build:frontend": "node scripts/run-project.mjs build:frontend",
+    "typecheck": "node scripts/run-project.mjs typecheck",
+    "test": "node scripts/test-local.mjs",
+    "setup:local": "node scripts/local-setup.mjs",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate:local": "node scripts/migrate-local.mjs",
+    "db:migrate:production": "node scripts/production-cli.mjs migrate",
+    "db:backup:production": "node scripts/production-cli.mjs backup",
+    "deploy": "node scripts/production-cli.mjs deploy"
+  },
+  "dependencies": {
+    "drizzle-orm": "0.45.2",
+    "jsqr": "1.4.0",
+    "qrcode": "^1.5.4"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "4.20260515.1",
+    "@types/node": "22.19.19",
+    "drizzle-kit": "0.31.10",
+    "typescript": "5.9.3",
+    "vite": "8.0.13",
+    "wrangler": "4.92.0",
+    "@types/qrcode": "^1.5.6"
+  },
+  "type": "module",
+  "overrides": {
+    "miniflare": {
+      "sharp": "0.35.4"
+    }
+  },
+  "packageManager": "pnpm@11.25.0"
+}
