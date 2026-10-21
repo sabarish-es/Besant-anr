@@ -8,7 +8,7 @@ const projectRoot = fileURLToPath(new URL('../', import.meta.url));
 export default defineConfig(({ mode }) => {
   const rootEnv = loadEnv(mode, projectRoot, '');
   const env = loadEnv(mode, frontendRoot, '');
-  const target = new URL(env.API_TARGET || `http://127.0.0.1:${rootEnv.API_PORT || '5174'}`);
+  const target = new URL(env.API_TARGET || `http://127.0.0.1:${rootEnv.API_PORT || '8787'}`);
   const proxy: ProxyOptions = {
     target: target.origin,
     changeOrigin: true,
@@ -28,7 +28,7 @@ export default defineConfig(({ mode }) => {
     plugins: [react()],
     resolve: { alias: { '@': fileURLToPath(new URL('./src/', import.meta.url)) } },
     server: {
-      host: '127.0.0.1', port: Number(env.FRONTEND_PORT || '5173'), strictPort: true,
+      host: '127.0.0.1', port: Number(env.FRONTEND_PORT || '5173'), strictPort: false,
       proxy: { '/api': proxy },
     },
     preview: {
